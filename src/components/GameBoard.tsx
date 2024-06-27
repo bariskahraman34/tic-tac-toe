@@ -1,11 +1,64 @@
-import { useCallback, useContext, useEffect } from "react"
+import { useCallback, useContext, useEffect,useState } from "react"
 import { GameContext } from "../context/GameContext"
-import { Grid, Paper, Typography, Button, Box } from '@mui/material';
+import { Grid, Paper, Typography, Button, Modal, Box } from '@mui/material';
+import Header from "./Header";
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  borderRadius:"15px",
+  boxShadow: 24,
+  pt: 2,
+  px: 4,
+  pb: 3,
+};
+
 
 export default function GameBoard() {
-  const {board,setBoard,nextPlayer,hasWinner,setNextPlayer,setHasWinner} = useContext(GameContext);
+  const {board,setBoard,nextPlayer,hasWinner,setNextPlayer,setHasWinner,setWinnerCounter,resetBoard,setRoundCounter,roundCounter,winnerCounter,resetGame} = useContext(GameContext);
+  const [open, setOpen] = useState(false);
+  const [isTie , setIsTie] = useState(false);
+  const handleClose = () => {
+    setOpen(false);
+    resetGame();
+  };
 
   useEffect(() => checkWinner() ,[nextPlayer])
+
+  useEffect(() => {
+    if (roundCounter === 3) {
+      const timeout = setTimeout(() => {
+        setOpen(true);
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [roundCounter]);
+
+  useEffect(() => {
+    if(isTie){
+      const timeout = setTimeout(() => {
+        setIsTie(false);
+      },2000)
+      return () => {
+        clearTimeout(timeout)
+      }
+    }
+  },[isTie])
+
+  useEffect(() => {
+    if(hasWinner){
+      const timeout = setTimeout(() => {
+        resetBoard();
+      },1000)
+
+      return () => clearTimeout(timeout)
+    }
+  },[hasWinner])
 
   const checkWinner = useCallback(() => {
     const WINNNING_CONDITIONS = [
@@ -17,16 +70,37 @@ export default function GameBoard() {
       [2,4,6],
       [2,5,8],
       [1,4,7]
-    ]
+    ];
 
-    WINNNING_CONDITIONS.map(probability => {
+    let winnerFound = false;
+
+    WINNNING_CONDITIONS.forEach(probability => {
       const [a ,b ,c] = probability;
 
-      if(board[a] && board[a] === board[b] && board[a] === board[c]){
+      if(board[a] && board[a] === board[b] && board[a] === board[c] && !winnerFound){
+        const winner= board[a];
+        setWinnerCounter((prev) => ({
+          scores:{
+            ...prev.scores,
+            [winner]:prev.scores[winner] + 1
+          }
+        }))
         setHasWinner(true);
+        setRoundCounter(roundCounter => roundCounter + 1)
+        winnerFound = true
       }
     })
-  }, [board,setHasWinner])
+
+    if(!winnerFound){
+      if(!hasWinner && board.every(box => box !== null)){
+        setIsTie(true);
+        setTimeout(() => {
+          resetBoard();
+        },1000)
+      }
+    }
+  }, [board]);
+
 
   const handleClick = (index:number) => {
     if(hasWinner) return;
@@ -61,26 +135,10 @@ export default function GameBoard() {
   };
 
   return (
-    <Grid container spacing={1} justifyContent="center" alignItems="center" style={{ maxWidth: 600 }}>
+    <Grid container spacing={1} justifyContent="center" alignItems="center" style={{ position:"relative"}}>
       <Grid item xs={12}>
         <Paper elevation={8} style={{ padding: 30, display: 'flex', flexDirection:"column", alignItems:"center", backgroundColor: '#27033d', borderRadius:15 }}>
-          <Typography variant="h4" gutterBottom color="#c2daf6">
-            Tic Tac Toe
-          </Typography>
-          <Grid display="grid" gridTemplateColumns="repeat(3,1fr)" justifyItems="center" alignItems="center" gap="20px" margin={3}>
-            <Box height={100} width={100} display="flex" flexDirection="column" alignItems="center" justifyContent="center" sx={{backgroundColor:"#72cff9", borderRadius:"10px"}}>
-              <Typography fontSize={16} fontWeight="bold">Player X</Typography>
-              <Typography fontSize={26} fontWeight="bold">0</Typography>
-            </Box>
-            <Box height={120} width={100} display="flex" flexDirection="column" alignItems="center" justifyContent="center" sx={{backgroundColor:"#6bfff1", borderRadius:"10px"}}>
-              <Typography fontWeight="bolder" fontSize={60} style={{color:`${nextPlayer === "X" ? "#72cff9" : "#dcbf3f"}`}}>{nextPlayer}</Typography>
-            </Box>
-            <Box height={100} width={100} display="flex" flexDirection="column" alignItems="center" justifyContent="center" sx={{backgroundColor:"#dcbf3f", borderRadius:"10px"}}>
-              <Typography fontSize={16} fontWeight="bold">Player O</Typography>
-              <Typography fontSize={26} fontWeight="bold">0</Typography>
-            </Box>
-          </Grid>
-
+          <Header />
           <Grid display="grid" gridTemplateColumns="repeat(3,1fr)" gap="20px" justifyItems= "center" alignItems="center">
             {board.map((box, index) => (
               <Grid item xs={4} key={index} width="100px" maxWidth="100% !important">
@@ -90,6 +148,21 @@ export default function GameBoard() {
           </Grid>
         </Paper>
       </Grid>
+      {isTie && <Box className="tieBox" sx={{borderRadius:"10px",backgroundColor:"#6bfff1",padding:3, position:"absolute", transform:"translate(-50%,-50%)" , top:"50%" , left:"50%" ,display:"flex",justifyContent:"center",alignItems:"center"}} ><Typography letterSpacing={20} sx={{textShadow: '11px 2px 9px rgba(39, 3, 61, 0.6)'}} variant="h1" fontWeight="bold" color="#fff">TIE</Typography></Box>}
+      <Modal
+        open={open}
+        onClose={handleClose}
+      >
+        <Box sx={{ ...style }} className="modalScale">
+          <Box sx={{marginBottom:2}}>
+            <Typography fontWeight="bold" variant="h5">WINNER IS ...</Typography>
+            <Typography fontWeight="bold" variant="h4">
+              {winnerCounter.scores.X > winnerCounter.scores.O ? "Player X" : "Player O"}
+            </Typography>
+          </Box>
+          <Button variant="contained" sx={{backgroundColor:"#27033d", '&:hover':{backgroundColor:"#4d1b6c"}}} onClick={handleClose}>Play Again</Button>
+        </Box>
+      </Modal>
     </Grid>
   )
 }
