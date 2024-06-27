@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect,useState } from "react"
 import { GameContext } from "../context/GameContext"
-import { Grid, Paper, Typography, Button, Modal, Box } from '@mui/material';
+import { Grid, Paper, Typography, Button, Modal, Box, Stack } from '@mui/material';
 import Header from "./Header";
 
 const style = {
@@ -144,7 +144,7 @@ export default function GameBoard() {
   return (
     <Grid container spacing={1} justifyContent="center" alignItems="center" style={{ position:"relative"}}>
       <Grid item xs={12}>
-        <Paper elevation={8} style={{ padding: 30, display: 'flex', flexDirection:"column", alignItems:"center", backgroundColor: '#27033d', borderRadius:15 }}>
+        <Paper style={{ padding: 30, display: 'flex', flexDirection:"column", alignItems:"center", backgroundColor: '#27033d'}}>
           <Header />
           <Grid display="grid" gridTemplateColumns="repeat(3,1fr)" gap="20px" justifyItems= "center" alignItems="center">
             {board.map((_box, index) => (
@@ -155,7 +155,11 @@ export default function GameBoard() {
           </Grid>
         </Paper>
       </Grid>
-      {isTie && <Box className="tieBox" sx={{borderRadius:"10px",backgroundColor:"#6bfff1",padding:3, position:"absolute", transform:"translate(-50%,-50%)" , top:"50%" , left:"50%" ,display:"flex",justifyContent:"center",alignItems:"center"}} ><Typography letterSpacing={20} sx={{textShadow: '11px 2px 9px rgba(39, 3, 61, 0.6)'}} variant="h1" fontWeight="bold" color="#fff">TIE</Typography></Box>}
+      <Stack direction="row" spacing={2}>
+        <Button variant="outlined" sx={{color:"#6cfff2"}} onClick={resetGame} >Reset the game</Button>
+        <Button variant="outlined" sx={{color:"#6cfff2"}} onClick={resetBoard} >Restart the board</Button>
+      </Stack>
+      {isTie && <Box className="tieBox" sx={{borderRadius:"10px",backgroundColor:"#6bfff1",padding:3, position:"absolute", transform:"translate(-50%,-50%)" , top:"50%" , left:"50%" ,display:"flex",justifyContent:"center",alignItems:"center"}} ><Typography letterSpacing={20} sx={{textShadow: '11px 2px 9px rgba(39, 3, 61, 0.6)'}} variant="h1" fontWeight="bold" color="#fff">TIE!</Typography></Box>}
       <Modal
         open={open}
         onClose={handleClose}
