@@ -20,9 +20,10 @@ const style = {
 
 
 export default function GameBoard() {
-  const {board,setBoard,nextPlayer,hasWinner,setNextPlayer,setHasWinner,setWinnerCounter,resetBoard,setRoundCounter,roundCounter,winnerCounter,resetGame} = useContext(GameContext);
+  const {board,setBoard,nextPlayer,hasWinner,setNextPlayer,setHasWinner,setWinnerCounter,resetBoard,setRoundCounter,roundCounter,winnerCounter,resetGame,winningLine,setWinningLine} = useContext(GameContext);
   const [open, setOpen] = useState(false);
   const [isTie , setIsTie] = useState(false);
+  
   const handleClose = () => {
     setOpen(false);
     resetGame();
@@ -89,7 +90,8 @@ export default function GameBoard() {
           }
         }))
         setHasWinner(true);
-        setRoundCounter(roundCounter => roundCounter + 1)
+        setRoundCounter(roundCounter => roundCounter + 1);
+        setWinningLine([a, b, c]);
         winnerFound = true
       }
     })
@@ -122,9 +124,11 @@ export default function GameBoard() {
     } else if (symbol === 'O') {
       buttonColor = '#dcbf3f';
     }
+    const isWinningCell = winningLine && winningLine.includes(index);
 
     return (
       <Button
+        className={`${isWinningCell ? 'winning-cell' : ''}`}
         disabled={hasWinner}
         variant="outlined"
         sx={{ width: '100px', height: '100px' , minWidth: '100px', padding: '0px' , backgroundColor:"#3c1558", borderColor:buttonColor, '&:hover':{borderColor:"#c2daf6"}}}
