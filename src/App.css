@@ -115,3 +115,9 @@ input, button, textarea, select {
     width: 0%;
   }
 }
+
+@media(width < 576px){
+  #root{
+    transform: scale(.8);
+  }
+}
