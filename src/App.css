@@ -21,7 +21,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 100dvh;
+  background-color: #27033d;
 }
 /*
   5. Improve media defaults
@@ -35,12 +36,6 @@ img, picture, video, canvas, svg {
 */
 input, button, textarea, select {
   font: inherit;
-}
-/*
-  7. Avoid text overflows
-*/
-p, h1, h2, h3, h4, h5, h6 {
-  overflow-wrap: break-word;
 }
 /*
   8. Create a root stacking context
