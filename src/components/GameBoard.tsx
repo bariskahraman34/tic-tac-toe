@@ -78,7 +78,10 @@ export default function GameBoard() {
       const [a ,b ,c] = probability;
 
       if(board[a] && board[a] === board[b] && board[a] === board[c] && !winnerFound){
-        const winner= board[a];
+        let winner: "X" | "O" = "X";
+        if(board[a] === "O"){
+          winner = "O";
+        }
         setWinnerCounter((prev) => ({
           scores:{
             ...prev.scores,
@@ -140,7 +143,7 @@ export default function GameBoard() {
         <Paper elevation={8} style={{ padding: 30, display: 'flex', flexDirection:"column", alignItems:"center", backgroundColor: '#27033d', borderRadius:15 }}>
           <Header />
           <Grid display="grid" gridTemplateColumns="repeat(3,1fr)" gap="20px" justifyItems= "center" alignItems="center">
-            {board.map((box, index) => (
+            {board.map((_box, index) => (
               <Grid item xs={4} key={index} width="100px" maxWidth="100% !important">
                 {renderBox(index)}
               </Grid>
