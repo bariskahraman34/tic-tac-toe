@@ -7,6 +7,7 @@ type GameContextType = {
   hasWinner: boolean;
   winnerCounter:WinnerCounterType;
   roundCounter:number;
+  winningLine:  number[] | null;
   setBoard: Dispatch<SetStateAction<Array<string | null>>>;
   setNextPlayer: Dispatch<SetStateAction<string>>;
   setHasWinner: Dispatch<SetStateAction<boolean>>;
@@ -14,6 +15,7 @@ type GameContextType = {
   setRoundCounter: Dispatch<SetStateAction<number>>;
   resetBoard: VoidFunction;
   resetGame: VoidFunction;
+  setWinningLine: Dispatch<SetStateAction<number[] | null>>;
 }
 
 type WinnerCounterType = {
@@ -29,13 +31,15 @@ const defaultState: GameContextType = {
   hasWinner: false,
   winnerCounter:{scores:{X:0,O:0}},
   roundCounter:0,
+  winningLine:null,
   setBoard: () => {},
   setNextPlayer: () => {},
   setHasWinner: () => {},
   setWinnerCounter: () => {},
   setRoundCounter: () => {},
   resetBoard: () => {},
-  resetGame: () => {}
+  resetGame: () => {},
+  setWinningLine: () => {}
 };
 
 export const GameContext = createContext<GameContextType>(defaultState);
@@ -46,10 +50,12 @@ export const GameProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [hasWinner, setHasWinner] = useState<boolean>(false);
   const [winnerCounter, setWinnerCounter] = useState<WinnerCounterType>({scores:{X:0,O:0}});
   const [roundCounter , setRoundCounter] = useState<number>(0);
+  const [winningLine, setWinningLine] = useState<number[] | null>(null);
   const resetBoard = () => {
     setBoard(Array(9).fill(null));
     setNextPlayer('X');
     setHasWinner(false);
+    setWinningLine(null);
   }
   const resetGame = () => {
     resetBoard();
@@ -69,7 +75,9 @@ export const GameProvider: FC<{ children: ReactNode }> = ({ children }) => {
     resetBoard,
     roundCounter,
     setRoundCounter,
-    resetGame
+    resetGame,
+    winningLine,
+    setWinningLine
   }
 
   return (
